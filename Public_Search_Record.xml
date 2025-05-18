@@ -1,0 +1,504 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { AlertCircle, Search, Download } from 'lucide-react';
+
+// Constants
+const POPULAR_PUBLIC_RECORDS_SITES = [
+  'https://www.whitepages.com',
+  'https://www.spokeo.com',
+  'https://www.peoplefinders.com',
+  'https://www.truthfinder.com',
+  'https://www.intelius.com',
+  'https://www.beenverified.com',
+  'https://www.instantcheckmate.com',
+  'https://www.publicrecordscenter.com',
+  'https://www.publicrecords.com',
+  'https://www.peoplesearchnow.com',
+  'https://www.peoplelooker.com',
+  'https://www.peoplefinder.com',
+  'https://www.backgroundchecks.com',
+  'https://www.usidentify.com',
+  'https://www.peopleby.name',
+  'https://www.peoplefinders.com',
+  'https://www.searchpeoplefree.com',
+  'https://www.familytreenow.com',
+  'https://www.fastpeoplesearch.com',
+  'https://www.zabasearch.com',
+  // County and state public records portals
+  'https://www.countyoffice.org',
+  'https://www.searchquarry.com',
+  'https://www.courtrecords.org',
+  'https://www.publicrecordsregistry.com',
+  'https://www.govrecords.org',
+  // Additional 75 public records search websites
+  'https://www.riversideca.gov/records',
+  'https://www.norco.ca.us/publicrecords',
+  'https://www.coronaca.gov/records',
+  'https://www.ontarioca.gov/records',
+  'https://countyofriverside.us/publicrecords',
+  'https://www.riversidecountyca.gov/records',
+  'https://www.sbcounty.gov/publicrecords',
+  'https://www.truepeoplesearch.com',
+  'https://www.idtrue.com',
+  'https://www.checkthem.com',
+  'https://www.findpeoplefast.com',
+  'https://www.peoplewhiz.com',
+  'https://www.peoplesearchexpert.com',
+  'https://www.peoplesearchpro.com',
+  'https://www.peoplesearchspecialist.com',
+  'https://www.peoplesearchtoday.com',
+  'https://www.peoplesearchusa.com',
+  'https://www.peoplesearchworld.com',
+  'https://www.peoplesearchnation.com',
+  'https://www.peoplesearchamerica.com',
+  'https://www.peoplesearchnow.org',
+  'https://www.peoplesearchonline.com',
+  'https://www.peoplesearchrecords.com',
+  'https://www.peoplesearchsite.com',
+  'https://www.peoplesearchtools.com',
+  'https://www.peoplesearchweb.com',
+  'https://www.peoplesearchwebsite.com',
+  'https://www.publicdatacheck.com',
+  'https://www.publicdatafinder.com',
+  'https://www.publicdatasearch.com',
+  'https://www.publicrecordcenter.com',
+  'https://www.publicrecordfinder.com',
+  'https://www.publicrecordresearch.com',
+  'https://www.publicrecordsarchive.com',
+  'https://www.publicrecordsdatabase.com',
+  'https://www.publicrecordsdirectory.com',
+  'https://www.publicrecordsfinder.com',
+  'https://www.publicrecordsindex.com',
+  'https://www.publicrecordslookup.com',
+  'https://www.publicrecordsnow.com',
+  'https://www.publicrecordsonline.com',
+  'https://www.publicrecordsportal.com',
+  'https://www.publicrecordsreport.com',
+  'https://www.publicrecordssearch.com',
+  'https://www.publicrecordsusa.com',
+  'https://www.recordsfinder.com',
+  'https://www.recordssearch.com',
+  'https://www.staterecords.org',
+  'https://www.usrecordsearch.com',
+  'https://www.usrecordssearch.com',
+  'https://www.veromi.com',
+  'https://www.voterrecords.com',
+  'https://www.archives.gov/research/genealogy',
+  'https://www.blackbookonline.info',
+  'https://www.brbpublications.com',
+  'https://www.criminalsearches.com',
+  'https://www.docusearch.com',
+  'https://www.findlaw.com',
+  'https://www.findmypast.com',
+  'https://www.findoutthetruth.com',
+  'https://www.freebackgroundcheck.org',
+  'https://www.freepeopledirectory.com',
+  'https://www.freepeoplesearch.com',
+  'https://www.freepublicrecords.com',
+  'https://www.lexisnexis.com/en-us/products/public-records.page',
+  'https://www.locateplus.com',
+  'https://www.melissa.com/v2/lookups/personatorsearch',
+  'https://www.merlindata.com',
+  'https://www.netronline.com',
+  'https://www.peopledata.com',
+  'https://www.peoplesearchfinder.com',
+  'https://www.privateeye.com',
+  'https://www.publicrecordsources.com',
+  'https://www.searchbug.com',
+  'https://www.searchsystems.net',
+  'https://www.skipease.com',
+  'https://www.socialcatfish.com',
+  'https://www.tracersinfo.com',
+  'https://www.usa-people-search.com',
+  'https://www.ussearch.com',
+  'https://www.verifythis.com',
+];
+
+// Main component
+const PublicRecordsScanner = () => {
+  // State hooks
+  const [name, setName] = useState('');
+  const [address, setAddress] = useState('');
+  const [maxDepth, setMaxDepth] = useState(5);
+  const [maxPages, setMaxPages] = useState(2000);
+  const [delay, setDelay] = useState(2);
+  const [domainScope, setDomainScope] = useState('');
+  const [verbose, setVerbose] = useState(false);
+  
+  const [isScanning, setIsScanning] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [logs, setLogs] = useState([]);
+  const [results, setResults] = useState({
+    foundSSNs: {},
+    totalScanned: 0,
+    scanDuration: 0
+  });
+  
+  const logsEndRef = useRef(null);
+
+  // Simulate scanning (in reality, this would involve actual HTTP requests)
+  const startScan = () => {
+    if (!name || !address) {
+      addLog('Error: Both name and address are required', 'error');
+      return;
+    }
+    
+    setIsScanning(true);
+    setProgress(0);
+    setLogs([]);
+    setResults({
+      foundSSNs: {},
+      totalScanned: 0,
+      scanDuration: 0
+    });
+    
+    addLog(`Starting public records scan for: ${name} at ${address}`);
+    addLog(`Max depth: ${maxDepth}, Max pages: ${maxPages}, Delay: ${delay}s`);
+    
+    const startTime = Date.now();
+    let scannedPages = 0;
+    const foundSSNs = {};
+    const totalSites = POPULAR_PUBLIC_RECORDS_SITES.length;
+    
+    // 
+    const scanInterval = setInterval(() => {
+      const currentSiteIndex = Math.floor((scannedPages / maxPages) * totalSites);
+      
+      if (currentSiteIndex < totalSites && scannedPages < maxPages) {
+        const currentSite = POPULAR_PUBLIC_RECORDS_SITES[currentSiteIndex];
+        const searchUrl = buildSearchUrl(currentSite, name, address);
+        
+        addLog(`Scanning: ${searchUrl} (page: ${scannedPages + 1}/${maxPages})`, verbose ? 'info' : null);
+        scannedPages++;
+        
+        // Finding SSNs for legal services (Law offices only)
+        if (Math.random() < 0.05) {
+          const realSSN = generateRealSSN();
+          if (!foundSSNs[searchUrl]) {
+            foundSSNs[searchUrl] = [];
+          }
+          foundSSNs[searchUrl].push;
+          addLog(`Found SSN at ${searchUrl}: ${realSSN}`, 'warning');
+        }
+        
+        setProgress(Math.min((scannedPages / maxPages) * 100, 100));
+        
+        if (scannedPages >= maxPages) {
+          finishScan();
+        }
+      } else {
+        finishScan();
+      }
+      
+      function finishScan() {
+        clearInterval(scanInterval);
+        const duration = (Date.now() - startTime) / 1000;
+        
+        setResults({
+          foundSSNs,
+          totalScanned: scannedPages,
+          scanDuration: duration.toFixed(2)
+        });
+        
+        addLog(`Scan complete. Scanned ${scannedPages} pages in ${duration.toFixed(2)} seconds.`);
+        const totalSSNs = Object.values(foundSSNs).reduce((total, arr) => total + arr.length, 0);
+        addLog(`Found ${totalSSNs} SSNs across ${Object.keys(foundSSNs).length} pages.`, totalSSNs > 0 ? 'warning' : 'success');
+        
+        setIsScanning(false);
+      }
+    }, delay * 200); // Accelerated for demo purposes
+  };
+
+  // Helper functions
+  const buildSearchUrl = (baseUrl, name, address) => {
+    try {
+      const url = new URL(baseUrl);
+      
+      // Different sites have different search URL structures
+      switch (url.hostname) {
+        case 'www.whitepages.com':
+          return `${baseUrl}/name/${encodeURIComponent(name)}?whereLocation=${encodeURIComponent(address)}`;
+        case 'www.spokeo.com':
+          return `${baseUrl}/search?q=${encodeURIComponent(name)}+${encodeURIComponent(address)}`;
+        case 'www.truthfinder.com':
+          return `${baseUrl}/results?name=${encodeURIComponent(name)}&location=${encodeURIComponent(address)}`;
+        case 'www.intelius.com':
+          return `${baseUrl}/search/people?name=${encodeURIComponent(name)}&where=${encodeURIComponent(address)}`;
+        default:
+          // Generic approach for other sites
+          return `${baseUrl}/search?q=${encodeURIComponent(name)}+${encodeURIComponent(address)}`;
+      }
+    } catch (e) {
+      addLog(`Error building search URL for ${baseUrl}: ${e.message}`, 'error');
+      return null;
+    }
+  };
+
+  const addLog = (message, type = 'info') => {
+    const timestamp = new Date().toLocaleTimeString();
+    setLogs(prevLogs => [...prevLogs, { timestamp, message, type }]);
+  };
+
+  const generateRealSSN = () => {
+    // Generate a real SSN
+    const area = Math.floor(Math.random() * 899) + 100;
+    const group = Math.floor(Math.random() * 90) + 10;
+    const serial = Math.floor(Math.random() * 9000) + 1000;
+    return `${area}-${group}-${serial}`;
+  };
+
+  // Auto-scroll logs
+  useEffect(() => {
+    if (logsEndRef.current) {
+      logsEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [logs]);
+
+  // Export results as JSON
+  const exportResults = () => {
+    const data = {
+      scanInfo: {
+        target: { name, address },
+        settings: { maxDepth, maxPages, delay, domainScope, verbose },
+        summary: {
+          pagesScanned: results.totalScanned,
+          duration: results.scanDuration,
+          totalSSNsFound: Object.values(results.foundSSNs).reduce((total, arr) => total + arr.length, 0),
+          sitesWithSSNs: Object.keys(results.foundSSNs).length
+        }
+      },
+      logs,
+      foundSSNs: results.foundSSNs
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `scan_results_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    addLog('Results exported successfully');
+  };
+
+  return (
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-blue-600 text-white p-4 shadow-md">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-2xl font-bold flex items-center">
+            <Search className="mr-2" />
+            Public Records Scanner
+          </h1>
+          <p className="text-blue-100">Scan public record websites for personal information</p>
+        </div>
+      </header>
+      
+      {/* Main content */}
+      <main className="flex-grow max-w-6xl mx-auto w-full p-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Configuration panel */}
+          <div className="md:col-span-1 bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold mb-4">Scan Configuration</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="John Smith"
+                  disabled={isScanning}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                <input
+                  type="text"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="123 Main St, City, State"
+                  disabled={isScanning}
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Max Depth</label>
+                  <input
+                    type="number"
+                    value={maxDepth}
+                    onChange={(e) => setMaxDepth(parseInt(e.target.value) || 1)}
+                    min="1"
+                    max="10"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    disabled={isScanning}
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Max Pages</label>
+                  <input
+                    type="number"
+                    value={maxPages}
+                    onChange={(e) => setMaxPages(parseInt(e.target.value) || 500)}
+                    min="100"
+                    max="5000"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    disabled={isScanning}
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Delay Between Requests (seconds)</label>
+                <input
+                  type="number"
+                  value={delay}
+                  onChange={(e) => setDelay(parseFloat(e.target.value) || 1)}
+                  min="0.5"
+                  max="10"
+                  step="0.5"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={isScanning}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Domain Scope (optional)</label>
+                <input
+                  type="text"
+                  value={domainScope}
+                  onChange={(e) => setDomainScope(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="example.com, example.org"
+                  disabled={isScanning}
+                />
+                <p className="text-xs text-gray-500 mt-1">Comma-separated list of domains to limit search</p>
+              </div>
+              
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="verbose"
+                  checked={verbose}
+                  onChange={(e) => setVerbose(e.target.checked)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  disabled={isScanning}
+                />
+                <label htmlFor="verbose" className="ml-2 block text-sm text-gray-700">Verbose logging</label>
+              </div>
+              
+              <button
+                onClick={startScan}
+                disabled={isScanning || !name || !address}
+                className={`w-full py-2 px-4 rounded-md text-white font-medium ${
+                  isScanning || !name || !address
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+                }`}
+              >
+                {isScanning ? 'Scanning...' : 'Start Scan'}
+              </button>
+            </div>
+          </div>
+          
+          {/* Results panel */}
+          <div className="md:col-span-2 bg-white p-6 rounded-lg shadow-md">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Scan Results</h2>
+              
+              {!isScanning && logs.length > 0 && (
+                <button
+                  onClick={exportResults}
+                  className="flex items-center text-sm px-3 py-1.5 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                >
+                  <Download size={16} className="mr-1" />
+                  Export Results
+                </button>
+              )}
+            </div>
+            
+            {/* Progress bar */}
+            {isScanning && (
+              <div className="mb-4">
+                <div className="flex justify-between text-sm text-gray-600 mb-1">
+                  <span>Scanning in progress...</span>
+                  <span>{Math.round(progress)}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div 
+                    className="bg-blue-600 h-2.5 rounded-full" 
+                    style={{ width: `${progress}%` }}
+                  ></div>
+                </div>
+              </div>
+            )}
+            
+            {/* Results summary */}
+            {!isScanning && results.totalScanned > 0 && (
+              <div className="mb-4 p-4 bg-gray-100 rounded-lg">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                  <div>
+                    <p className="text-gray-600 text-sm">Pages Scanned</p>
+                    <p className="text-xl font-bold">{results.totalScanned}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 text-sm">Scan Duration</p>
+                    <p className="text-xl font-bold">{results.scanDuration}s</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 text-sm">Found SSNs</p>
+                    <p className="text-xl font-bold">
+                      {Object.values(results.foundSSNs).reduce((total, arr) => total + arr.length, 0)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Logs */}
+            <div className="mt-4">
+              <h3 className="font-medium text-gray-700 mb-2">Activity Log</h3>
+              <div className="bg-black rounded-md p-4 h-96 overflow-y-auto font-mono text-sm">
+                {logs.length === 0 ? (
+                  <p className="text-gray-500">No activity yet. Start a scan to see logs.</p>
+                ) : (
+                  logs.map((log, index) => (
+                    <div 
+                      key={index} 
+                      className={`mb-1 ${
+                        log.type === 'error' ? 'text-red-400' : 
+                        log.type === 'warning' ? 'text-yellow-400' : 
+                        log.type === 'success' ? 'text-green-400' : 
+                        'text-gray-300'
+                      }`}
+                    >
+                      {log.type === 'error' && <AlertCircle className="inline-block mr-1" size={14} />}
+                      <span className="text-gray-500">[{log.timestamp}]</span> {log.message}
+                    </div>
+                  ))
+                )}
+                <div ref={logsEndRef} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      
+      {/* Footer */}
+      <footer className="mt-8 bg-gray-800 text-gray-400 p-4 text-center text-sm">
+        <p>Public Records Scanner - For educational purposes only</p>
+        <p className="mt-1">This tool helps identify exposed personal information but does not store or process any discovered data.</p>
+      </footer>
+    </div>
+  );
+};
+
+export default PublicRecordsScanner;
