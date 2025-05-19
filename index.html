@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APK Builder - Public Search Records</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                    },
+                }
+            }
+        }
+
+        // Check for dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+    </script>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen flex flex-col">
+    <header class="bg-primary text-white p-4 shadow-md">
+        <h1 class="text-2xl font-bold text-center">Public Search Records - APK Builder</h1>
+    </header>
+
+    <main class="flex-grow p-4 max-w-4xl mx-auto w-full">
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">Project Overview</h2>
+            <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 shadow-sm">
+                <ul class="list-disc ml-6 space-y-2">
+                    <li>Repository: <span class="font-mono">dudetheporn1/Public_Search_Records</span></li>
+                    <li>Language: Kotlin (100%)</li>
+                    <li>Key Files: Public_Search_Record.xml, Theme.kt, build.gradle, settings.gradle</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">Building the APK</h2>
+            <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 shadow-sm">
+                <ol class="list-decimal ml-6 space-y-4">
+                    <li>
+                        <p class="font-semibold">Clone the repository</p>
+                        <div class="bg-gray-200 dark:bg-gray-700 p-2 rounded mt-2 overflow-x-auto">
+                            <code class="text-sm font-mono">git clone https://github.com/dudetheporn1/Public_Search_Records.git</code>
+                        </div>
+                    </li>
+                    <li>
+                        <p class="font-semibold">Navigate to the project directory</p>
+                        <div class="bg-gray-200 dark:bg-gray-700 p-2 rounded mt-2 overflow-x-auto">
+                            <code class="text-sm font-mono">cd Public_Search_Records</code>
+                        </div>
+                    </li>
+                    <li>
+                        <p class="font-semibold">Ensure you have the Android SDK and Java Development Kit installed</p>
+                        <p class="text-sm mt-1">Android Studio is recommended for the easiest setup</p>
+                    </li>
+                    <li>
+                        <p class="font-semibold">Build the APK using Gradle</p>
+                        <div class="bg-gray-200 dark:bg-gray-700 p-2 rounded mt-2 overflow-x-auto">
+                            <code class="text-sm font-mono">./gradlew assembleDebug</code>
+                        </div>
+                        <p class="text-sm mt-1">For a release build, use:</p>
+                        <div class="bg-gray-200 dark:bg-gray-700 p-2 rounded mt-2 overflow-x-auto">
+                            <code class="text-sm font-mono">./gradlew assembleRelease</code>
+                        </div>
+                    </li>
+                    <li>
+                        <p class="font-semibold">Find the APK file</p>
+                        <p>The generated APK will be located at:</p>
+                        <div class="bg-gray-200 dark:bg-gray-700 p-2 rounded mt-2 overflow-x-auto">
+                            <code class="text-sm font-mono">app/build/outputs/apk/debug/app-debug.apk</code>
+                        </div>
+                        <p class="text-sm mt-1">Or for release build:</p>
+                        <div class="bg-gray-200 dark:bg-gray-700 p-2 rounded mt-2 overflow-x-auto">
+                            <code class="text-sm font-mono">app/build/outputs/apk/release/app-release.apk</code>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">Common Issues</h2>
+            <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 shadow-sm">
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="font-medium">Missing SDK Components</h3>
+                        <p class="text-sm mt-1">If you encounter errors about missing SDK components, use Android Studio's SDK Manager to install them.</p>
+                    </div>
+                    <div>
+                        <h3 class="font-medium">Gradle Version Mismatch</h3>
+                        <p class="text-sm mt-1">If gradle versions don't match, use the provided gradle wrapper by using <code class="font-mono">./gradlew</code> instead of direct gradle commands.</p>
+                    </div>
+                    <div>
+                        <h3 class="font-medium">Signing Configuration for Release</h3>
+                        <p class="text-sm mt-1">For release builds, you'll need to configure a signing key in the build.gradle file.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h2 class="text-xl font-semibold mb-4">Demo App Interface</h2>
+            <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+                <div class="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-300 dark:border-gray-700">
+                    <div class="bg-primary p-4 text-white">
+                        <h3 class="font-bold text-lg">Public Search Records</h3>
+                    </div>
+                    <div class="p-4">
+                        <div class="mb-4">
+                            <label for="searchType" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search Type</label>
+                            <select id="searchType" class="w-full p-2 border rounded-md text-base text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600">
+                                <option value="person">Person</option>
+                                <option value="property">Property</option>
+                                <option value="business">Business</option>
+                                <option value="court">Court Records</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="searchQuery" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search Query</label>
+                            <input type="text" id="searchQuery" placeholder="Enter search terms..." class="w-full p-2 border rounded-md text-base text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600">
+                        </div>
+                        <div class="mb-4">
+                            <label for="location" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Location</label>
+                            <input type="text" id="location" placeholder="City, State, or ZIP" class="w-full p-2 border rounded-md text-base text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600">
+                        </div>
+                        <button id="searchButton" class="w-full bg-primary hover:bg-opacity-90 text-white font-bold py-2 px-4 rounded">
+                            Search Records
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-200 dark:bg-gray-800 p-4 text-center text-sm">
+        <p>This is a demonstration app for APK building instructions. Actual functionality depends on the repository content.</p>
+    </footer>
+
+    <script>
+        // Demo functionality
+        document.getElementById('searchButton').addEventListener('click', function() {
+            const searchType = document.getElementById('searchType').value;
+            const searchQuery = document.getElementById('searchQuery').value;
+            const location = document.getElementById('location').value;
+            
+            if (!searchQuery) {
+                alert('Please enter a search query');
+                return;
+            }
+            
+            // For demo purposes only
+            console.log('Search initiated:', {
+                type: searchType,
+                query: searchQuery,
+                location: location
+            });
+
+            // In a real app, this would trigger an API call or other search functionality
+            alert(`Searching for ${searchType} records matching "${searchQuery}" in ${location || 'all locations'}.\n\nThis is just a demo. In a real app, this would perform an actual search.`);
+        });
+    </script>
+</body>
+                  </html>
+                          
